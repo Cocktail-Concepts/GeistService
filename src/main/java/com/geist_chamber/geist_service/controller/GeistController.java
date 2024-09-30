@@ -17,7 +17,7 @@ public class GeistController extends AbstractUtilController {
     }
 
     @GetMapping("/get")
-    public ResponseEntity<?> getMyData(@RequestHeader(value = "Authorization") String token) {
+    public ResponseEntity<?> getMyUserData(@RequestHeader(value = "Authorization") String token) {
         return singleResponse(authenticationFacade.getAuthenticatedUser());
     }
 }

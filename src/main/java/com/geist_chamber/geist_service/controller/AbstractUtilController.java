@@ -39,6 +39,6 @@ public abstract class AbstractUtilController {
     public ResponseEntity<?> singleResponse(Object data){
         Map<String,Object> res=new HashMap<>();
         res.put("data",data);
-        return new ResponseEntity<Map<String,Object>>(res,HttpStatus.OK);
+        return new ResponseEntity<>(res, HttpStatus.OK);
     }
 }

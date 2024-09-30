@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 @RestController
-@CrossOrigin
 @RequestMapping("/auth")
 public class AuthController extends AbstractUtilController {
     private final AuthService authService;
@@ -22,6 +21,11 @@ public class AuthController extends AbstractUtilController {
     public ResponseEntity<?> signUp(@Valid @RequestBody GeistSignUpDto geist) {
         authService.signUp(geist);
         return successResponse("User registered successfully. Check your email for OTP.");
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody GeistSignUpDto loginRequest) {
+        return singleResponse(authService.login(loginRequest));
     }
 
     @PostMapping("/verify-otp")

@@ -2,6 +2,7 @@ package com.geist_chamber.geist_service.service;
 
 import com.geist_chamber.geist_service.dto.VocationDto;
 import com.geist_chamber.geist_service.entity.Collective;
+import com.geist_chamber.geist_service.entity.Geist;
 import com.geist_chamber.geist_service.entity.Vocation;
 import com.geist_chamber.geist_service.exception.RestError;
 import com.geist_chamber.geist_service.repository.CollectiveRepository;
@@ -19,16 +20,16 @@ public class VocationService {
         this.collectiveRepository = collectiveRepository;
     }
 
-    public void createAndUpdateVocation(VocationDto vocationDto) {
+    public void createAndUpdateVocation(Geist geist,VocationDto vocationDto) {
         Vocation vocation;
         Collective collective = collectiveRepository.findByCollectiveId(vocationDto.getCollectiveId()).orElseThrow();
-        Vocation realmEx = vocationRepository.findByNameAndCollective(vocationDto.getName(), collective);
+        Vocation vocationEx = vocationRepository.findByNameAndCollective(vocationDto.getName(), collective);
         if (vocationDto.getVocationId() != null) {
             vocation = vocationRepository.findByVocationId(vocationDto.getVocationId()).orElseThrow(() -> new RestError(HttpStatus.NOT_FOUND, "realm not found"));
-            if (realmEx != null && !realmEx.getVocationId().equals(vocation.getVocationId()))
-                throw new RestError(HttpStatus.IM_USED, "realm already exist");
+            if (vocationEx != null && !vocationEx.getVocationId().equals(vocation.getVocationId()))
+                throw new RestError(HttpStatus.IM_USED, "vocation already exist");
         } else {
-            if (realmEx != null) throw new RestError(HttpStatus.IM_USED, "realm already exist");
+            if (vocationEx != null) throw new RestError(HttpStatus.IM_USED, "vocation already exist");
             vocation = new Vocation();
             vocation.setCollective(collective);
         }

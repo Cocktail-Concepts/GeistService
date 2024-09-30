@@ -38,7 +38,7 @@ public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler({ RestError.class })
     @ResponseBody
     public ResponseEntity<?> handleGenericException(RestError ex) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.entry("msg",ex.getErrorMessage()));
+        return ResponseEntity.status(ex.getErrorCode()).body(Map.entry("msg",ex.getErrorMessage()));
     }
 
 }

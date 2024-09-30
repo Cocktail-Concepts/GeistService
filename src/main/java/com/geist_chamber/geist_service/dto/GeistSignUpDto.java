@@ -1,8 +1,15 @@
 package com.geist_chamber.geist_service.dto;
 
-public class GeistSignUpDto {
+import com.geist_chamber.geist_service.custom_annotations.ValidEmail;
 
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
+
+public class GeistSignUpDto {
+    @ValidEmail
     private String email;
+    @NotEmpty
+    @Min(8)
     private String password;
 
     public void setEmail(String email) {

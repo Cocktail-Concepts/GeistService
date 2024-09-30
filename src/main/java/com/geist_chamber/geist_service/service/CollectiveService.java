@@ -1,5 +1,6 @@
 package com.geist_chamber.geist_service.service;
 
+import com.geist_chamber.geist_service.constant.Potency;
 import com.geist_chamber.geist_service.repository.CollectiveRepository;
 import com.geist_chamber.geist_service.dto.CollectiveDto;
 import com.geist_chamber.geist_service.entity.Collective;
@@ -26,6 +27,7 @@ public class CollectiveService {
             if (collectiveEx != null) throw new RestError(HttpStatus.IM_USED, "collective by this name already exists");
             collective = new Collective();
             collective.setOrganizedBy(geist);
+            geist.getPotentiates().add(Potency.ORGANIZER);
             collective.addGeist(geist);
         }
         collective.setName(collectiveDto.getName());

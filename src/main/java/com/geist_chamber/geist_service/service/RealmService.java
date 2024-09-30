@@ -23,6 +23,7 @@ public class RealmService {
     public void createAndUpdateRealm(Geist geist, RealmDto realmDto) {
         Realm realm;
         Collective collective = collectiveRepository.findByCollectiveId(realmDto.getCollectiveId()).orElseThrow();
+        if(!collective.getGeists().contains(geist)) throw new RestError(HttpStatus.UNAUTHORIZED,"you are not member of this collective");
         Realm realmEx = realmRepository.findByNameAndCollective(realmDto.getName(),collective);
         if(realmDto.getId() != null){
             realm = realmRepository.findByRealmId(realmDto.getId()).orElseThrow(()->new RestError(HttpStatus.NOT_FOUND,"realm not found"));

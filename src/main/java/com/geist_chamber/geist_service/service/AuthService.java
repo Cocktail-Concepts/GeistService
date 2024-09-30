@@ -12,6 +12,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +24,8 @@ import java.util.concurrent.TimeUnit;
 public class AuthService {
     private final JwtUtil jwtUtil;
 
-    public AuthService(JwtUtil jwtUtil, GeistRepository geistRepository, PasswordEncoder passwordEncoder, JavaMailSender mailSender, EncryptionUtil encryptionUtil, RedisTemplate redisTemplate,
+
+    public AuthService(JwtUtil jwtUtil, AuthenticationManager authenticationManager, GeistRepository geistRepository, PasswordEncoder passwordEncoder, JavaMailSender mailSender, EncryptionUtil encryptionUtil, RedisTemplate redisTemplate,
                        VocationRepository vocationRepository) {
         this.jwtUtil = jwtUtil;
         this.geistRepository = geistRepository;
@@ -45,9 +47,9 @@ public class AuthService {
     private final VocationRepository vocationRepository;
 
     public void signUp(GeistSignUpDto geistSignUpDTO) {
-        String encEmail = encryptionUtil.encrypt(geistSignUpDTO.getEmail());
+        String encEmail = encryptionUtil.encrypt(geistSignUpDTO.getEmail().toLowerCase().trim());
         Geist geistEx = geistRepository.findByEmail(geistSignUpDTO.getEmail());
-        if (geistEx != null) throw new RestError(HttpStatus.IM_USED, "user already exists for this mail address");
+        if (geistEx != null) throw new RestError(HttpStatus.CONFLICT, "user already exists for this mail address");
         Geist geist = new Geist();
         geist.setEmail(geistSignUpDTO.getEmail());
         geist.setGeistname(encEmail);
@@ -56,6 +58,15 @@ public class AuthService {
         geist.setPassword(passwordEncoder.encode(geistSignUpDTO.getPassword()));
         geistRepository.save(geist);
         sendEmailOtp(geistSignUpDTO.getEmail());
+
+    }
+
+    public String login(GeistSignUpDto loginRequest) {
+        Geist geist = geistRepository.findByEmail(loginRequest.getEmail());
+        if (geist == null) throw new RestError(HttpStatus.NOT_FOUND, "user not found");
+        if (passwordEncoder.matches(loginRequest.getPassword(), geist.getPassword()))
+            return jwtUtil.generateToken(geist);
+        else throw new RestError(HttpStatus.UNAUTHORIZED, "wrong password.try again or reset password");
     }
 
     private String extractNameFromEmail(String email) {
@@ -75,7 +86,11 @@ public class AuthService {
         String cachedOtp = (String) redisTemplate.opsForValue().get(email);
         if (cachedOtp == null) throw new RestError(HttpStatus.NOT_FOUND, "otp not found");
         String token = null;
-        if (cachedOtp.equals(otp)) token = jwtUtil.generateToken(geist);
+        if (cachedOtp.equals(otp)) {
+            token = jwtUtil.generateToken(geist);
+            geist.setEmailVerified(true);
+            geistRepository.save(geist);
+        }
         return token;
     }
 

@@ -51,6 +51,7 @@ public class Geist implements UserDetails {
     private String photo;
     @Enumerated
     private Set<Potency> potentiates;
+    private boolean emailVerified;
 
     @ManyToMany(mappedBy = "geists")
     @JsonBackReference

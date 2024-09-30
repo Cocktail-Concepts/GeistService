@@ -23,7 +23,7 @@ public class VocationController extends AbstractUtilController{
 
     @PostMapping("/add-update")
     public ResponseEntity<?> createAndUpdateCollective(@RequestHeader(value = "Authorization") String token, @RequestBody VocationDto vocationDto) {
-        vocationService.createAndUpdateVocation(vocationDto);
+        vocationService.createAndUpdateVocation(authenticationFacade.getAuthenticatedUser(),vocationDto);
         return successResponse("vocation updated");
     }
 }

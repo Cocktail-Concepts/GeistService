@@ -33,6 +33,7 @@ public class SecurityConfiguration {
                     authorize.requestMatchers("/auth/**").permitAll();
                     authorize.anyRequest().authenticated();
                 })
+                .cors(c->c.disable())
                 .csrf(csrf -> csrf.ignoringRequestMatchers("/token"))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
